@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 
-// MongoDB Model
+// Authority Model
 const Authority = require('../models/Authority');
-
 
 // VALIDATION Import
 const { authorityValidation } = require('../validation');
 
-// Add Authority
-router.post('/addAuthority', async (req, res) => {
+// @routes POST api/authorities
+// @desc Add Authority
+router.route('/addAuthority').post(async (req, res) => {
 
 	// Validate User
 	const { error } = authorityValidation(req.body);
@@ -36,10 +36,12 @@ router.post('/addAuthority', async (req, res) => {
 	}
 });
 
+// @routes GET api/authorities
+// @desc Get Authority by name
 router.route('/:name').get( async (req, res) => {
 
 	try {
-		const authorityExist = await Authority.findOne({ Authority: req.params.name }, (err, data) => {
+		await Authority.findOne({ Authority: req.params.name }, (err, data) => {
 			console.log("Getting Autority!")
 			if (err) {
 				console.log("Error: "+err)
@@ -58,7 +60,8 @@ router.route('/:name').get( async (req, res) => {
 	}
 })
 
-router.route('/').get( async (_, res) => {
+// Get all authorities
+router.route('/all').get( async (_, res) => {
 
 	try {
 		await Authority.find({}, (err, data) => {
@@ -80,42 +83,39 @@ router.route('/').get( async (_, res) => {
 	}
 })
 
-// // Login User
-// router.post('/login', async(req, res) => {
-// 	const { error } = loginValidation(req.body);
-// 	if (error) return res.status(400).send(error.details[0].message);
+// Delete authority 
+router.delete('/:name', async(req, res) => {
+	try {
+		const removedAuthority = await User.deleteOne({ Authority: req.params.name });
+		res.json(removedAuthority);
+	} catch(err) {
+		res.json({ message: err });
+	}
+});
 
-// 	// Check if Email Exists
-// 	const user = await User.findOne({ email: req.body.email });
-// 	if(!user) return res.status(400).send('Email Does Not Exist');
+// @routes PATCH api/authorities
+// @desc Upate Authority
+router.route('/:name').patch( async(req, res) => {
 
-// 	const validPass = await bcrypt.compare(req.body.password, user.password)
-// 	if(!validPass) return res.status(400).send('Invalid Password');
-
-// 	// Create & Assign Token 
-// 	const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-// 	res.header('auth-token', token).send(token);
-// });
-
-// // Delete user 
-// router.delete('/:uid/only', async(req, res) => {
-// 	try {
-// 		const removedUser = await User.deleteOne({ _id: req.params.uid });
-// 		res.json(removedUser);
-// 	} catch(err) {
-// 		res.json({ message: err });
-// 	}
-// });
-
-// router.delete('/:uid/all', async(req, res) => {
-// 	try {
-// 		const removedUser = await User.deleteOne({ _id: req.params.uid, get: req.body });
-// 		const removedPosts = await Post.deleteMany({ userID: req.params.uid });
-// 		res.json(removedUser);
-// 		res.json(removedPosts);
-// 	} catch(err) {
-// 		res.json({ message: err });
-// 	}
-// });
-
+	console.log("Updating " + req.params.name + " fields")
+	await Authority.findOneAndUpdate({
+		Authority: req.params.name
+	},
+	{
+		$set: { 
+			Contact: req.body.Contact, 
+			Population: req.body.Population, 
+			Area: req.body.Area,
+			MedianAge: req.body.MedianAge
+		}
+	},
+	{ new: true },
+	(err, data) => {
+		if (!err){
+			res.json(data);
+		}else{
+			res.json(err);
+		}
+	})
+});
 module.exports = router;
