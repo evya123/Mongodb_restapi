@@ -4,7 +4,7 @@
   "description": "BIU demo",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app"
   },
   "author": "Evyatar Shtern",
   "license": "ISC",

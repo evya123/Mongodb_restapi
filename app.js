@@ -1,23 +1,18 @@
-var express = require("express");
-require("dotenv").config();
+const express = require("express");
+const authorityRouter = require("./routes/authority");
+const cors = require("cors");
+const { MONGO_URI } = require('./config')
+const mongoose = require("mongoose");
 
-var authorityRouter = require("./routes/authority");
-var cors = require("cors");
-
-// DB connection
-var MONGODB_URL = process.env.DB_CONNECTION;
-var mongoose = require("mongoose");
-mongoose.connect(MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
-  console.log("Connected to %s", MONGODB_URL);
-  console.log("App is running ... \n");
-  console.log("Press CTRL + C to stop the process. \n");
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+  console.log("Connected to mongodb server");
 })
 	.catch(err => {
-		console.error("App starting error:", err.message);
+		console.error("Mongodb connection error:", err.message);
 		process.exit(1);
 	});
   
-  var app = express();
+const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }))  ;
