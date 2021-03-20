@@ -5,20 +5,34 @@ const { MONGO_URI } = require('./config');
 const mongoose = require("mongoose");
 const router = require("./routes/authority");
 
-mongoose.connect(MONGO_URI, 
-	{ 
+mongoose.connect(MONGO_URI, { 
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 		useFindAndModify: false
-	})
-	.then(() => {
-  		console.log("Connected to mongodb server");
-	})
-	.catch(err => {
-		console.error("Mongodb connection error:", err.message);
-		process.exit(1);
 	});
+
+mongoose.connection.on('connected', function () {
+  console.log('Mongoose connected to db');
+}); 
   
+// If the connection throws an error
+mongoose.connection.on('error',function (err) { 
+  console.log('Mongoose connection error: ' + err);
+}); 
+
+// When the connection is disconnected
+mongoose.connection.on('disconnected', function () { 
+  console.log('Mongoose connection disconnected'); 
+});
+
+// If the Node process ends, close the Mongoose connection 
+process.on('SIGINT', function() {   
+  mongoose.connection.close(function () { 
+    console.log('Mongoose connection disconnected through app termination'); 
+    process.exit(0); 
+  }); 
+}); 
+
 const app = express();
 
 // Middleware

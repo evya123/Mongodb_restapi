@@ -29,7 +29,9 @@ router.route('/addAuthority').post(async (req, res) => {
 	});
 
 	try{
-		const savedAuthority = await authority.save();
+		await authority.save().then((err, doc) => {
+			console.log('Saved authority')
+		});
 		res.json({ authority: savedAuthority.Authority, Contact: savedAuthority.Contact });
 	} catch (err) {
 		res.json({ message: err });
@@ -98,7 +100,7 @@ router.delete('/:name', async(req, res) => {
 router.route('/:name').patch( async(req, res) => {
 
 	console.log("Updating " + req.params.name + " fields")
-	await Authority.findOneAndUpdate({
+	await Authority.findOneAndUpdate({ //need to change since it's directed function and without middleware
 		Authority: req.params.name
 	},
 	{
@@ -116,7 +118,7 @@ router.route('/:name').patch( async(req, res) => {
 			res.json(data);
 		}else{
 			console.log('Failed saving document due to '+err)
-			res.json(err);
+			res.status(400).json(err);
 		}
 	})
 });
