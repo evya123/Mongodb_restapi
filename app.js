@@ -3,11 +3,13 @@ const authorityRouter = require("./routes/authority");
 const cors = require("cors");
 const { MONGO_URI } = require('./config');
 const mongoose = require("mongoose");
+const router = require("./routes/authority");
 
 mongoose.connect(MONGO_URI, 
 	{ 
 		useNewUrlParser: true,
-		useUnifiedTopology: true
+		useUnifiedTopology: true,
+		useFindAndModify: false
 	})
 	.then(() => {
   		console.log("Connected to mongodb server");
@@ -27,7 +29,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
 //Route Prefixes
-app.use("api/authorities", authorityRouter);
+app.use('/api/authorities', authorityRouter);
+
+app.get('/',async(_, res) => {
+	console.log('In /')
+	res.json({msg: "App is working!"})
+})
+
 app.listen(3000, () => {
   console.log("Listening to port 3000");
 });

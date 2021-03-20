@@ -112,10 +112,13 @@ router.route('/:name').patch( async(req, res) => {
 	{ new: true },
 	(err, data) => {
 		if (!err){
+			console.log('Update document succeeded')
 			res.json(data);
 		}else{
+			console.log('Failed saving document due to '+err)
 			res.json(err);
 		}
 	})
 });
+
 module.exports = router;
