@@ -2,6 +2,7 @@ const express = require("express");
 
 // Authority Model
 const Authority = require("../models/Authority");
+const apiResponse = require("../helpers/apiResponse");
 
 // VALIDATION Import
 const { authorityValidation } = require("../validation");
@@ -21,13 +22,20 @@ exports.addAuthority = [
   async (req, res) => {
     // Validate User
     const { error } = authorityValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error)
+      return apiResponse.ErrorResponse(
+        res,
+        "Validation error: " + error.details[0].message
+      );
 
     // Check if Authority already in database
     const authorityExist = await Authority.findOne({
       Authority: req.body.Authority,
     });
-    if (authorityExist) return res.status(400).send("Authority already exists");
+    if (authorityExist) {
+      console.log("Already exist");
+      return apiResponse.ErrorResponse(res, "Authority already exists");
+    }
 
     // Validated And Create User
     const authority = new Authority({
@@ -39,15 +47,27 @@ exports.addAuthority = [
     });
 
     try {
-      await authority.save().then((err, doc) => {
+      authority.save(async (err) => {
+        if (err) {
+          console.log("Error: " + err);
+          return apiResponse.ErrorResponse(res, err);
+        }
         console.log("Saved authority");
-      });
-      res.json({
-        authority: savedAuthority.Authority,
-        Contact: savedAuthority.Contact,
+        let authorityData = {
+          _id: authority._id,
+          Authority: authority.Authority,
+        };
+        return apiResponse.successResponseWithData(
+          res,
+          "Operation success",
+          authorityData
+        );
       });
     } catch (err) {
-      res.json({ message: err });
+      console.log("Error " + err);
+      if (err) {
+        return apiResponse.ErrorResponse(res, err);
+      }
     }
   },
 ];
@@ -66,17 +86,24 @@ exports.getAuthority = [
         console.log("Getting Autority!");
         if (err) {
           console.log("Error: " + err);
-          return next("Error: " + err);
+          return apiResponse.ErrorResponse(res, "Error: " + err);
         } else {
           console.log("Value returned: " + data);
-          if (data) res.json(data);
-          else res.status(400).send("Could not find document!");
+          if (data)
+            return apiResponse.successResponseWithData(
+              res,
+              "Operation success",
+              data
+            );
+          else
+            return apiResponse.ErrorResponse(res, "Could not find document!");
         }
       });
     } catch (err) {
-      res
-        .status(400)
-        .send("Could not complete the request due to internal error!\n" + err);
+      return apiResponse.ErrorResponse(
+        res,
+        "Could not complete the request due to internal error!\n" + err
+      );
     }
   },
 ];
@@ -93,17 +120,25 @@ exports.getAuthorities = [
         console.log("Getting Autorities!");
         if (err) {
           console.log("Error: " + err);
-          return next("Error: " + err);
+          return apiResponse.ErrorResponse(res, "Error: " + err);
         } else {
           console.log("Value returned: " + data);
-          if (data) res.json(data);
-          else res.status(400).send("Could not find document!");
+          if (data) {
+            return apiResponse.successResponseWithData(
+              res,
+              "Operation success",
+              data
+            );
+          } else {
+            return apiResponse.ErrorResponse(res, "Could not find document!");
+          }
         }
       });
     } catch (err) {
-      res
-        .status(400)
-        .send("Could not complete the request due to internal error!\n" + err);
+      return apiResponse.ErrorResponse(
+        res,
+        "Could not complete the request due to internal error!\n" + err
+      );
     }
   },
 ];
@@ -112,7 +147,7 @@ exports.getAuthorities = [
  * Delete Authority by name.
  *
  * @param {string}      Authority
- * 
+ *
  */
 exports.deleteAuthority = [
   async (req, res) => {
