@@ -1,16 +1,13 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const router = express.Router();
+import { genSalt, hash, compare } from "bcryptjs";
+import { sign } from "jsonwebtoken";
 
 // MongoDB Model
-const User = require("../models/User");
+import User, { findOne, deleteOne } from "../models/User";
 
 // VALIDATION Import
-const { registerValidation, loginValidation } = require("../validation");
+import { registerValidation, loginValidation } from "../validation";
 
-// Register User
-exports.registerUser = [
+export const registerUser = [
   async (req, res) => {
     // Validate User
     const { error } = registerValidation(req.body);
@@ -21,13 +18,13 @@ exports.registerUser = [
       );
 
     // Check if User already in database
-    const emailExist = await User.findOne({ email: req.body.email });
+    const emailExist = await findOne({ email: req.body.email });
     if (emailExist)
       return apiResponse.ErrorResponse(res, "Email already exists");
 
     // Hash Passwords
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const salt = await genSalt(10);
+    const hashedPassword = await hash(req.body.password, salt);
 
     // Validated And Create User
     const user = new User({
@@ -61,8 +58,7 @@ exports.registerUser = [
   },
 ];
 
-// Login User
-exports.loginUser = [
+export const loginUser = [
   async (req, res) => {
     const { error } = loginValidation(req.body);
     if (error)
@@ -72,23 +68,22 @@ exports.loginUser = [
       );
 
     // Check if Email Exists
-    const user = await User.findOne({ email: req.body.email });
+    const user = await findOne({ email: req.body.email });
     if (!user) return apiResponse.ErrorResponse(res, "Email Does Not Exist");
 
-    const validPass = await bcrypt.compare(req.body.password, user.password);
+    const validPass = await compare(req.body.password, user.password);
     if (!validPass) return apiResponse.ErrorResponse(res, "Invalid Password");
 
     // Create & Assign Token
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+    const token = sign({ _id: user._id }, process.env.TOKEN_SECRET);
     res.header("auth-token", token).send(token);
   },
 ];
 
-// Delete user
-exports.deleteUser = [
+export const deleteUser = [
   async (req, res) => {
     try {
-      const removedUser = await User.deleteOne({ _id: req.params.uid });
+      const removedUser = await deleteOne({ _id: req.params.uid });
       return apiResponse.successResponseWithData(
         res,
         "Operation success",

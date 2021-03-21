@@ -1,8 +1,9 @@
-var express = require("express");
-var authorityRouter = require("./authority");
+import express from "express";
+import authorityRouter from "./authority";
+import userRouter from "./user";
 
 var app = express();
 
-app.use("/authority/", authorityRouter);
-
-module.exports = app;
+app.use("/authority", authorityRouter);
+app.user("/user", userRouter);
+export default app;
