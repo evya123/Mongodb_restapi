@@ -1,0 +1,5 @@
+app/node_modules
+app/npm-debug.log
+app/events.js
+app/README.md
+.vscode/
