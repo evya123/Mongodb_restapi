@@ -35,7 +35,7 @@ exports.addAuthority = [
       return apiResponse.ErrorResponse(res, "Authority already exists");
     }
 
-    // Validated And Create authority
+    // Create authority
     const authority = new Authority({
       Authority: req.body.Authority,
       Contact: req.body.Contact,
@@ -146,6 +146,7 @@ exports.getAuthorities = [
  *
  * @param {string}      Authority
  *
+ * @returns {Object}
  */
 exports.deleteAuthority = [
   async (req, res) => {
@@ -153,9 +154,13 @@ exports.deleteAuthority = [
       const removedAuthority = await User.deleteOne({
         Authority: req.params.name,
       });
-      res.json(removedAuthority);
+      return apiResponse.successResponseWithData(
+        res,
+        "Operation success",
+        removedAuthority
+      );
     } catch (err) {
-      res.json({ message: err });
+      return apiResponse.ErrorResponse(res, err);
     }
   },
 ];
@@ -175,7 +180,6 @@ exports.updateAuthority = [
     console.log("Updating " + req.params.name + " fields");
     await Authority.findOneAndUpdate(
       {
-        //need to change since it's directed function and without middleware
         Authority: req.params.name,
       },
       {
@@ -186,14 +190,19 @@ exports.updateAuthority = [
           MedianAge: req.body.MedianAge,
         },
       },
+      // new: true return the object after the change
       { new: true },
       (err, data) => {
         if (!err) {
           console.log("Update document succeeded");
-          res.json(data);
+          return apiResponse.successResponseWithData(
+            res,
+            "Operation success",
+            data
+          );
         } else {
           console.log("Failed saving document due to " + err);
-          res.status(400).json(err);
+          return apiResponse.ErrorResponse(res, err);
         }
       }
     );
