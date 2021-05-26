@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { model } = require('mongoose');
 
 const authorityValidation = data => {
 	const AuthoritySchema = Joi.object({
@@ -10,6 +11,18 @@ const authorityValidation = data => {
 	});
 
 	return AuthoritySchema.validate(data);
+};
+
+const needSpecificationsValidation = data => {
+	const needSpecificationsSchema = Joi.object({
+		AuthorityID: Joi.objectId().required(),
+		Field: Joi.array().items(Joi.string()),
+		Needs: Joi.array().items(Joi.string()),
+		ExpectedResult: Joi.string().min(6).required(),
+		Budget: Joi.number().required()
+	});
+
+	return needSpecificationsSchema.validate(data);
 };
 
 const registerValidation = data => {
@@ -34,3 +47,4 @@ const loginValidation = data => {
 module.exports.authorityValidation = authorityValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.registerValidation = registerValidation;
+model.exports.needSpecificationsValidation = needSpecificationsValidation;

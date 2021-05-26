@@ -1,0 +1,20 @@
+# We're testing, so 1Gi is fine
+persistence:
+  size: 1Gi
+
+# Use the initContainer to change permissions for us so Mongo can write to the volume
+volumePermissions.enabled: true
+
+# Use the storageClass we created earlier
+global:
+  storageClass: standard
+
+service:
+
+  # Make AWS load balancer
+  type: LoadBalancer
+
+  # Tell AWS to make our load balancer an internal LB
+  annotations: {
+    service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+  }

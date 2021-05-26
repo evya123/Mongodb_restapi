@@ -8,10 +8,9 @@ const AuthoritySchema = mongoose.Schema({
     max: 10,
   },
   Contact: {
-    type: String,
-    required: true,
-    min: 6,
-    max: 30,
+    type: mongoose.Schema.Types.ObjectId,
+		ref: 'User',
+    required: true
   },
   Population: {
     type: Number,
