@@ -8,21 +8,19 @@ const NeedSpecificationsSchema = mongoose.Schema({
 	},
 	Field: {
 		type: [String],
-		required: true,
 		default: []
 	},
 	Needs: {
 		type: [String],
-		required: true,
 		default: []
 	},
 	ExpectedResult: {
 		type: String,
-		required: true
+		default: ''
 	},
 	Budget: {
 		type: Number,
-		required: true
+		default: 0
 	}
 });
 

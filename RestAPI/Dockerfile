@@ -1,5 +1,7 @@
 FROM node:latest
 ENV NODE_ENV=production
+RUN apt update -y && apt upgrade npm -y
+RUN npm i npm@latest -g
 
 COPY app .
 

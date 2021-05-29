@@ -1,5 +1,6 @@
 // Authority Model
 const Authority = require("./../models/Authority.js");
+// const NeedSpecifications = require("./../models/NeedSpecifications.js");
 const apiResponse = require("./../helpers/apiResponse.js");
 
 // VALIDATION Import
@@ -20,12 +21,12 @@ exports.addAuthority = [
   async (req, res) => {
     // Validate authority
     const { error } = authorityValidation(req.body);
-    if (error)
+    if (error) {
       return apiResponse.ErrorResponse(
         res,
         "Validation error: " + error.details[0].message
       );
-
+    }
     // Check if Authority already in database
     const authorityExist = await Authority.findOne({
       Authority: req.body.Authority,
@@ -34,7 +35,6 @@ exports.addAuthority = [
       console.log("Already exist");
       return apiResponse.ErrorResponse(res, "Authority already exists");
     }
-
     // Create authority
     const authority = new Authority({
       Authority: req.body.Authority,
@@ -43,23 +43,17 @@ exports.addAuthority = [
       Area: req.body.Area,
       MedianAge: req.body.MedianAge,
     });
-
+    // trying to save
     try {
       authority.save(async (err) => {
         if (err) {
           console.log("Error: " + err);
           return apiResponse.ErrorResponse(res, err);
         }
-        console.log("Saved authority");
-        let authorityData = {
-          _id: authority._id,
-          Authority: authority.Authority,
-        };
-        return apiResponse.successResponseWithData(
-          res,
-          "Operation success",
-          authorityData
-        );
+      });
+      console.log("Saved authority!");
+      return apiResponse.successResponseWithData(res, "Operation success", {
+        authority_id: authority._id,
       });
     } catch (err) {
       console.log("Error " + err);
@@ -144,21 +138,22 @@ exports.getAuthorities = [
 /**
  * Delete Authority by name.
  *
- * @param {string}      Authority
+ * @param {string} Authority
  *
  * @returns {Object}
  */
 exports.deleteAuthority = [
   async (req, res) => {
     try {
-      const removedAuthority = await User.deleteOne({
+      let doc = await Authority.findOne({
         Authority: req.params.name,
       });
-      return apiResponse.successResponseWithData(
-        res,
-        "Operation success",
-        removedAuthority
-      );
+      deleted = await doc.deleteOne();
+      if (deleted) {
+        return apiResponse.successResponse(res, "Operation success");
+      } else {
+        return apiResponse.ErrorResponse(res, "Nothing to delete!");
+      }
     } catch (err) {
       return apiResponse.ErrorResponse(res, err);
     }

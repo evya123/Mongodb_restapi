@@ -1,10 +1,25 @@
 const Joi = require('joi');
-const { model } = require('mongoose');
+
+// const contactValidation = date => {
+// 	const ContactSchema = Joi.object({
+// 		First_Name: Joi.string().required(),
+// 		Last_Name: Joi.string().required(),
+// 		Email: Joi.string().email().required(),
+// 	  });
+	
+// 	  return ContactSchema.validate(date)
+// }
 
 const authorityValidation = data => {
+	const ContactSchema = Joi.object().keys({
+		First_Name: Joi.string().required(),
+		Last_Name: Joi.string().required(),
+		Email: Joi.string().email().required(),
+	});
+
 	const AuthoritySchema = Joi.object({
-		Authority: Joi.string().min(3).required(),
-		Contact: Joi.string().min(6).required(),
+		Authority: Joi.string().required(),
+		Contact: ContactSchema,
 		Population: Joi.number().required(),
 		Area: Joi.number().required(),
 		MedianAge: Joi.number().required()
@@ -47,4 +62,4 @@ const loginValidation = data => {
 module.exports.authorityValidation = authorityValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.registerValidation = registerValidation;
-model.exports.needSpecificationsValidation = needSpecificationsValidation;
+module.exports.needSpecificationsValidation = needSpecificationsValidation;

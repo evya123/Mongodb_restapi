@@ -19,7 +19,7 @@ router.post('/addAuthority',authorityController.addAuthority);
 // Delete authority
 router.delete("/:name", authorityController.deleteAuthority);
 
-// @routes PATCH api/authorities
+// @routes PATCH api/authority
 // @desc Upate Authority
 router.patch("/:name", authorityController.updateAuthority);
 
