@@ -1,13 +1,25 @@
 FROM node:latest
-ENV NODE_ENV=production
+
+ENV NODE_ENV=production \
+    GROUP_ID=1001 \
+    USER_ID=1001 \
+    GROUP=flask \
+    USER=flask
+
+WORKDIR /flask
+
+COPY app/package.json /flask
+RUN npm install
+
 RUN apt update -y && apt upgrade npm -y
-RUN npm i npm@latest -g
 
-COPY app .
+COPY app /flask
 
-WORKDIR /app
+RUN groupadd -r -g ${GROUP_ID} ${GROUP} && \
+    useradd -rm -s /bin/bash -g ${GROUP} -u ${USER_ID} ${USER} && \
+    chown -R ${GROUP}:${USER} /flask
 
-RUN npm install --production
+USER flask
 
 EXPOSE 3000
 

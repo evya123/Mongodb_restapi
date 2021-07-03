@@ -1,29 +1,6 @@
 const mongoose = require("mongoose");
-const NeedSpecifications = require("./../models/NeedSpecifications.js");
-
-const NeedSpecificationsSchema = mongoose.Schema({
-  AuthorityID: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Authority",
-    required: true,
-  },
-  Field: {
-    type: [String],
-    default: [],
-  },
-  Needs: {
-    type: [String],
-    default: [],
-  },
-  ExpectedResult: {
-    type: String,
-    default: "",
-  },
-  Budget: {
-    type: Number,
-    default: 0,
-  },
-});
+const NeedSpecifications = require("./NeedSpecifications.js");
+var logger  = require('../helpers/logger');
 
 const ContactSchema = mongoose.Schema({
   _id: false,
@@ -65,35 +42,35 @@ const AuthoritySchema = mongoose.Schema({
 });
 
 AuthoritySchema.post("save", async function (doc, next) {
-  console.log("Authority save post action");
+  logger.winston.info("Authority save post action");
   try {
     const ns = new NeedSpecifications({
       AuthorityID: doc._id,
     });
-    console.log("Created ns, saving now.");
+    logger.winston.info("Created ns, saving now.");
     ns.save(async (err) => {
       if (err) {
-        console.log("ns save error", err);
+        logger.winston.info("ns save error", err);
         next(err);
       }
     });
-    console.log("Saved default ns");
+    logger.winston.info("Saved default ns");
   } catch (err) {
-    console.log("post save error", err);
+    logger.winston.info("post save error", err);
     next(err);
   }
 });
 
 AuthoritySchema.pre("deleteOne",{ document: true, query: false }, async function (next) {
-  console.log("Authority deleteone pre action");
-  console.log("Trying to delete ns");
+  logger.winston.info("Authority deleteone pre action");
+  logger.winston.info("Trying to delete ns");
   try {
     await NeedSpecifications.findOneAndDelete({ AuthorityID: this._id });
   } catch (err) {
-    console.log("pre deleteone error", err);
+    logger.winston.info("pre deleteone error", err);
     next(err);
   }
-  console.log("ns deleted");
+  logger.winston.info("ns deleted");
 });
 
 module.exports = mongoose.model("Authority", AuthoritySchema);

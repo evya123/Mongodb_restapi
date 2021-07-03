@@ -2,37 +2,38 @@ var express = require("express");
 var cors = require("cors");
 var { MONGO_URI } = require("./config");
 var mongoose = require("mongoose");
-var logger = require("morgan");
 var apiRouter = require("./routes/api");
 var indexRouter = require("./routes/index")
 var apiResponse = require("./helpers/apiResponse");
+var logger = require('./helpers/logger');
 
-//
 mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true,
+    auth: { authSource : "admin" },
+    user: process.env.MONGO_USERNAME ,
+    pass: process.env.MONGO_PASSWORD,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
 });
-
 mongoose.connection.on("connected", function () {
-  console.log("Mongoose connected to db");
+  logger.winston.info("Mongoose connected to db");
 });
 
 // If the connection throws an error
 mongoose.connection.on("error", function (err) {
-  console.log("Mongoose connection error: " + err);
+  logger.winston.info("Mongoose connection error: " + err);
 });
 
 // When the connection is disconnected
 mongoose.connection.on("disconnected", function () {
-  console.log("Mongoose connection disconnected");
+  logger.winston.info("Mongoose connection disconnected");
 });
 
 // If the Node process ends, close the Mongoose connection
 process.on("SIGINT", function () {
   mongoose.connection.close(function () {
-    console.log("Mongoose connection disconnected through app termination");
+    logger.winston.info("Mongoose connection disconnected through app termination");
     process.exit(0);
   });
 });
@@ -42,7 +43,6 @@ var app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(logger("dev"));
 
 //To allow cross-origin requests
 app.use(cors());

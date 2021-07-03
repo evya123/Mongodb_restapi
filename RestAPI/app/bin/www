@@ -6,6 +6,7 @@
 var app = require("../app");
 var debug = require("debug")("rest-api-nodejs-mongodb:server");
 var http = require("http");
+var logger  = require('../helpers/logger');
 
 /**
  * Get port from environment and store in Express.
@@ -62,10 +63,10 @@ function onError(error) {
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case "EACCES":
-      console.error(bind + " requires elevated privileges");
+      logger.winston.error(bind + " requires elevated privileges");
       process.exit(1);
     case "EADDRINUSE":
-      console.error(bind + " is already in use");
+      logger.winston.error(bind + " is already in use");
       process.exit(1);
     default:
       throw error;
@@ -79,6 +80,6 @@ function onError(error) {
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
-  console.log("port: " + addr.port + " addr: " + addr.address)
+  logger.winston.info("port: " + addr.port + " addr: " + addr.address)
   debug("Listening on " + bind);
 }

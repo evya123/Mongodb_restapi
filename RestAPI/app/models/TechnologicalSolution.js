@@ -12,23 +12,23 @@ const TechnologicalSolutionSchema = mongoose.Schema({
 	},
 	ImplementationSystem: {
 		type: String,
-		required: true
+		default: ""
 	},
 	Budget: {
 		type: Number,
-		required: true
+		default: 0
 	},
 	Effect: {
 		type: String,
-		required: true
+		default: ""
 	},
 	Constrains: {
 		type: String,
-		required: true
+		default: ""
 	},
 	NeededWrapper: {
 		type: String,
-		required: true
+		default: ""
 	}
 });
 

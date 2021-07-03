@@ -13,14 +13,13 @@ router.get("/:name", authorityController.getAuthority);
 // Get all authorities
 router.get("/all", authorityController.getAuthorities);
 
-// Add autority
-router.post('/addAuthority',authorityController.addAuthority);
-
 // Delete authority
 router.delete("/:name", authorityController.deleteAuthority);
 
 // @routes PATCH api/authority
 // @desc Upate Authority
 router.patch("/:name", authorityController.updateAuthority);
+
+router.patch("/:name/ns", authorityController.updateNeedSpecification)
 
 module.exports = router;

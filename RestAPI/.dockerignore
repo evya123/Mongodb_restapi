@@ -1,5 +1,5 @@
 app/node_modules
 app/npm-debug.log
 app/events.js
+app/package-lock.json
 app/README.md
-.vscode/

@@ -1,7 +1,8 @@
 // Authority Model
 const Authority = require("./../models/Authority.js");
-// const NeedSpecifications = require("./../models/NeedSpecifications.js");
+const NeedSpecifications = require("./../models/NeedSpecifications.js");
 const apiResponse = require("./../helpers/apiResponse.js");
+var logger = require("../helpers/logger");
 
 // VALIDATION Import
 const { authorityValidation } = require("./../validation.js");
@@ -19,6 +20,7 @@ const { authorityValidation } = require("./../validation.js");
  */
 exports.addAuthority = [
   async (req, res) => {
+    logger.winston.info("inside addAuthority");
     // Validate authority
     const { error } = authorityValidation(req.body);
     if (error) {
@@ -32,7 +34,7 @@ exports.addAuthority = [
       Authority: req.body.Authority,
     });
     if (authorityExist) {
-      console.log("Already exist");
+      logger.winston.info("Already exist");
       return apiResponse.ErrorResponse(res, "Authority already exists");
     }
     // Create authority
@@ -47,16 +49,16 @@ exports.addAuthority = [
     try {
       authority.save(async (err) => {
         if (err) {
-          console.log("Error: " + err);
+          logger.winston.info("Error: " + err);
           return apiResponse.ErrorResponse(res, err);
         }
       });
-      console.log("Saved authority!");
+      logger.winston.info("Saved authority!");
       return apiResponse.successResponseWithData(res, "Operation success", {
         authority_id: authority._id,
       });
     } catch (err) {
-      console.log("Error " + err);
+      logger.winston.info("Error " + err);
       if (err) {
         return apiResponse.ErrorResponse(res, err);
       }
@@ -75,12 +77,12 @@ exports.getAuthority = [
   async (req, res) => {
     try {
       await Authority.findOne({ Authority: req.params.name }, (err, data) => {
-        console.log("Getting Autority!");
+        logger.winston.info("Getting Autority!");
         if (err) {
-          console.log("Error: " + err);
+          logger.winston.info("Error: " + err);
           return apiResponse.ErrorResponse(res, "Error: " + err);
         } else {
-          console.log("Value returned: " + data);
+          logger.winston.info("Value returned: " + data);
           if (data)
             return apiResponse.successResponseWithData(
               res,
@@ -109,12 +111,12 @@ exports.getAuthorities = [
   async (_, res) => {
     try {
       await Authority.find({}, (err, data) => {
-        console.log("Getting Autorities!");
+        logger.winston.info("Getting Autorities!");
         if (err) {
-          console.log("Error: " + err);
+          logger.winston.info("Error: " + err);
           return apiResponse.ErrorResponse(res, "Error: " + err);
         } else {
-          console.log("Value returned: " + data);
+          logger.winston.info("Value returned: " + data);
           if (data) {
             return apiResponse.successResponseWithData(
               res,
@@ -172,7 +174,7 @@ exports.deleteAuthority = [
  */
 exports.updateAuthority = [
   async (req, res) => {
-    console.log("Updating " + req.params.name + " fields");
+    logger.winston.info("Updating " + req.params.name + " fields");
     await Authority.findOneAndUpdate(
       {
         Authority: req.params.name,
@@ -189,15 +191,67 @@ exports.updateAuthority = [
       { new: true },
       (err, data) => {
         if (!err) {
-          console.log("Update document succeeded");
+          logger.winston.info("Update document succeeded");
           return apiResponse.successResponseWithData(
             res,
             "Operation success",
             data
           );
         } else {
-          console.log("Failed saving document due to " + err);
+          logger.winston.info("Failed saving document due to " + err);
           return apiResponse.ErrorResponse(res, err);
+        }
+      }
+    );
+  },
+];
+
+/**
+ * Update ns.
+ * @param {string}      Authority
+ * @param {string}      Field
+ * @param {string}      Needs
+ * @param {string}      ExpectedResult
+ * @param {string}      Budget
+ *
+ * @returns {Object}
+ */
+exports.updateNeedSpecification = [
+  async (req, res) => {
+    logger.winston.info("Updating " + req.params.name + " ns fields");
+    const authority_id = await Authority.findOne(
+      {
+        Authority: req.params.name,
+      },
+      "_id"
+    );
+    NeedSpecifications.findOneAndUpdate(
+      {
+        AuthorityID: authority_id,
+      },
+      {
+        $push: {
+          Field: req.body.Field,
+          Needs: req.body.Needs,
+          ExpectedResult: req.body.ExpectedResult,
+          Budget: req.body.Budget,
+        },
+      },
+      { new: true },
+      (err, data) => {
+        if (!err) {
+          logger.winston.info("Update document succeeded");
+          return apiResponse.successResponseWithData(
+            res,
+            "Operation success",
+            data
+          );
+        } else {
+          logger.winston.info("Failed saving document due to " + err);
+          return apiResponse.ErrorResponse(
+            res,
+            "Failed saving document due to " + err
+          );
         }
       }
     );

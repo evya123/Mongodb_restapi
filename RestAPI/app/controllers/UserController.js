@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
+var logger  = require('../helpers/logger');
 // MongoDB Model
 const User = require("../models/User");
 
@@ -38,10 +38,10 @@ exports.registerUser = [
     try {
       user.save(async (err) => {
         if (err) {
-          console.log("Error: " + err);
+          logger.winston.info("Error: " + err);
           return apiResponse.ErrorResponse(res, err);
         }
-        console.log("Saved user");
+        logger.winston.info("Saved user");
         let savedUser = {
           _id: authority._id,
           name: user.name,
@@ -54,7 +54,7 @@ exports.registerUser = [
         );
       });
     } catch (err) {
-      console.log("Error " + err);
+      logger.winston.info("Error " + err);
       return apiResponse.ErrorResponse(res, err);
     }
   },
