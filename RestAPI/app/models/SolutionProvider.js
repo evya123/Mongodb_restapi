@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const techSolution = require("./TechnologicalSolution");
 var logger  = require('../helpers/logger');
 const TechnologicalSolution = require("./TechnologicalSolution");
+const bestPractice = require("./BestPractice");
+const BestPractice = require("./BestPractice");
 
 const SolutionProviderSchema = mongoose.Schema({
   Provider: {
@@ -57,14 +59,15 @@ SolutionProviderSchema.post("save", async function (doc, next) {
 
 SolutionProviderSchema.pre("deleteOne",{ document: true, query: false }, async function (next) {
   logger.winston.info("Provider deleteone pre action");
-  logger.winston.info("Trying to delete ts");
+  logger.winston.info("Trying to delete ts and bp");
   try {
     await TechnologicalSolution.findOneAndDelete({ SolutionProvider: this._id });
+    await BestPractice.findOneAndDelete({ Provider: this._id });
   } catch (err) {
     logger.winston.info("pre deleteone error", err);
     next(err);
   }
-  logger.winston.info("ts deleted");
+  logger.winston.info("ts and bp deleted");
 });
 
 module.exports = mongoose.model("SolutionProvider", SolutionProviderSchema);

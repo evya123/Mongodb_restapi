@@ -241,7 +241,7 @@ exports.updateTechSolution = [
       },
       "_id"
     );
-    logger.winston.info("provider found: "+provider_id)
+    logger.winston.info("provider found: " + provider_id);
     TechnologicalSolution.findOneAndUpdate(
       {
         SolutionProvider: provider_id,
