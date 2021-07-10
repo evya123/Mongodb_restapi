@@ -9,6 +9,23 @@ const BestPracticeSchema = mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Authority',
 		required: true
+	},
+	Result: {
+		type: String
+	},
+	Problems: {
+		type: String
+	},
+	Method: {
+		type: String
+	},
+	Suitability: {
+		type: String
+	},
+	Provider: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Provider',
+		required: true
 	}
 });
 

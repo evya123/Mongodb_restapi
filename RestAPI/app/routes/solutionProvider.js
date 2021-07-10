@@ -21,4 +21,13 @@ router.delete("/:name", solutionProviderController.deleteProvider);
 // @desc Update provider
 router.patch("/:name", solutionProviderController.updateProvider);
 
+// @routes PATCH api/provider
+// @desc Update tech solution
+router.patch("/ts/:name", solutionProviderController.updateTechSolution);
+
+// @routes POST api/provider
+// @desc Add best practice to provider
+router.post("/bp/add", solutionProviderController.addBestPractice);
+
+
 module.exports = router;

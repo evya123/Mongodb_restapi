@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const NeedSpecifications = require("./NeedSpecifications.js");
+const NeedSpecifications = require("./NeedSpecifications");
 var logger  = require('../helpers/logger');
 
 const ContactSchema = mongoose.Schema({
