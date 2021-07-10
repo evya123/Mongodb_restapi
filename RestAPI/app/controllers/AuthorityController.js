@@ -108,9 +108,9 @@ exports.getAuthority = [
  * @returns {Object}
  */
 exports.getAuthorities = [
-  async (_, res) => {
+  async (_  , res) => {
     try {
-      await Authority.find({}, (err, data) => {
+      Authority.find({}).exec((err, data) => {
         logger.winston.info("Getting Autorities!");
         if (err) {
           logger.winston.info("Error: " + err);

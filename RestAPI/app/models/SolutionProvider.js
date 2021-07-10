@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const techSolution = require("./TechnologicalSolution");
 var logger  = require('../helpers/logger');
+const TechnologicalSolution = require("./TechnologicalSolution");
 
 const SolutionProviderSchema = mongoose.Schema({
   Provider: {
@@ -54,16 +55,16 @@ SolutionProviderSchema.post("save", async function (doc, next) {
   }
 });
 
-// SolutionProviderSchema.pre("deleteOne",{ document: true, query: false }, async function (next) {
-//   logger.winston.info("Authority deleteone pre action");
-//   logger.winston.info("Trying to delete ns");
-//   try {
-//     await NeedSpecifications.findOneAndDelete({ AuthorityID: this._id });
-//   } catch (err) {
-//     logger.winston.info("pre deleteone error", err);
-//     next(err);
-//   }
-//   logger.winston.info("ns deleted");
-// });
+SolutionProviderSchema.pre("deleteOne",{ document: true, query: false }, async function (next) {
+  logger.winston.info("Provider deleteone pre action");
+  logger.winston.info("Trying to delete ts");
+  try {
+    await TechnologicalSolution.findOneAndDelete({ SolutionProvider: this._id });
+  } catch (err) {
+    logger.winston.info("pre deleteone error", err);
+    next(err);
+  }
+  logger.winston.info("ts deleted");
+});
 
 module.exports = mongoose.model("SolutionProvider", SolutionProviderSchema);

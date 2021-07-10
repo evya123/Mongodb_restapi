@@ -35,6 +35,7 @@ services:
         - mongo
     mongo:
         container_name: mongodb
+        hostname: mongodb
         image: mongo:latest
         restart: always
         volumes:
@@ -49,3 +50,19 @@ services:
             options:
                 max-size: "200k"
                 max-file: "10"
+    mongoclient:
+        image: mongoclient/mongoclient:latest
+        container_name: mongoclient
+        hostname: mongoclient
+        environment: 
+            MONGO_URL: $MONGO_URL
+            MONGOCLIENT_DEFAULT_CONNECTION_URL: $MONGO_URL
+            MONGOCLIENT_AUTH: "true"
+            MONGOCLIENT_USERNAME: $MONGOEXPRESS_LOGIN
+            MONGOCLIENT_PASSWORD: $MONGOEXPRESS_PASSWORD
+        depends_on:
+            - mongo
+        links:
+            - mongo:mongodb
+        ports:
+            - 3300:3000

@@ -1,10 +1,9 @@
 const SolutionProvider = require("./../models/SolutionProvider.js");
 const apiResponse = require("./../helpers/apiResponse.js");
-const logger  = require('../helpers/logger');
+const logger = require("../helpers/logger");
 
 // VALIDATION Import
 const { solutionProviderValidation } = require("./../validation.js");
-
 
 /**
  * Add Authority.
@@ -19,7 +18,7 @@ const { solutionProviderValidation } = require("./../validation.js");
  *
  * @returns {Object}
  */
- exports.addSolutionProvider = [
+exports.addSolutionProvider = [
   async (req, res) => {
     logger.winston.info("inside addSolutionProvider");
     // Validate provider
@@ -46,7 +45,7 @@ const { solutionProviderValidation } = require("./../validation.js");
       NeedTarget: req.body.NeedTarget,
       Cost: req.body.Cost,
       TechnicalDescription: req.body.TechnicalDescription,
-      ImplementationDescription: req.body.ImplementationDescription
+      ImplementationDescription: req.body.ImplementationDescription,
     });
     // trying to save
     try {
@@ -70,11 +69,47 @@ const { solutionProviderValidation } = require("./../validation.js");
 ];
 
 /**
+ * Get Provider by name.
+ *
+ * @param {string}      Provider
+ *
+ * @returns {Object}
+ */
+ exports.getProvider = [
+  async (req, res) => {
+    try {
+      await SolutionProvider.findOne({ Provider: req.params.name }, (err, data) => {
+        logger.winston.info("Getting Provider!");
+        if (err) {
+          logger.winston.info("Error: " + err);
+          return apiResponse.ErrorResponse(res, "Error: " + err);
+        } else {
+          logger.winston.info("Value returned: " + data);
+          if (data)
+            return apiResponse.successResponseWithData(
+              res,
+              "Operation success",
+              data
+            );
+          else
+            return apiResponse.ErrorResponse(res, "Could not find document!");
+        }
+      });
+    } catch (err) {
+      return apiResponse.ErrorResponse(
+        res,
+        "Could not complete the request due to internal error!\n" + err
+      );
+    }
+  },
+];
+
+/**
  * Get All Providers.
  *
  * @returns {Object}
  */
- exports.getProviders = [
+exports.getProviders = [
   async (_, res) => {
     try {
       await SolutionProvider.find({}, (err, data) => {
@@ -101,5 +136,81 @@ const { solutionProviderValidation } = require("./../validation.js");
         "Could not complete the request due to internal error!\n" + err
       );
     }
+  },
+];
+
+
+/**
+ * Delete Provider by name.
+ *
+ * @param {string} Provider
+ *
+ * @returns {Object}
+ */
+ exports.deleteProvider = [
+  async (req, res) => {
+    try {
+      let doc = await SolutionProvider.findOne({
+        Provider: req.params.name,
+      });
+      deleted = await doc.deleteOne();
+      if (deleted) {
+        return apiResponse.successResponse(res, "Operation success");
+      } else {
+        return apiResponse.ErrorResponse(res, "Nothing to delete!");
+      }
+    } catch (err) {
+      return apiResponse.ErrorResponse(res, err);
+    }
+  },
+];
+
+/**
+ * Update Provider.
+ *
+ * @param {string}      Provider
+ * @param {string}      Field
+ * @param {string}      Solution
+ * @param {string}      NeedTarget
+ * @param {string}      Cost
+ * @param {string}      TechnicalDescription
+ * @param {string}      ImplementationDescription
+ *
+ * @returns {Object}
+ */
+exports.updateProvider = [
+  async (req, res) => {
+    logger.winston.info("Updating " + req.params.name + " fields");
+    await SolutionProvider.findOneAndUpdate(
+      {
+        Provider: req.params.name,
+      },
+      {
+        $set: {
+          Provider: req.body.Provider,
+          Field: req.body.Field,
+          Solution: req.body.Solution,
+          NeedTarget: req.body.NeedTarget,
+          Cost: req.body.Cost,
+          TechnicalDescription: req.body.TechnicalDescription,
+          ImplementationDescription: req.body.ImplementationDescription
+        },
+      },
+      // new: true return the object after the change
+      { new: true },
+      (err, data) => {
+        if (!err) {
+          logger.winston.info("Update document succeeded");
+          return apiResponse.successResponseWithData(
+            res,
+            "Operation success",
+            data
+          );
+        } else {
+          logger.winston.info("Failed saving document due to " + err);
+          return apiResponse.ErrorResponse(res, err);
+        }
+      }
+    );
   },
 ];

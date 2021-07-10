@@ -11,7 +11,7 @@ router.post("/addAuthority", authorityController.addAuthority);
 router.get("/:name", authorityController.getAuthority);
 
 // Get all authorities
-router.get("/all", authorityController.getAuthorities);
+router.get("/", authorityController.getAuthorities);
 
 // Delete authority
 router.delete("/:name", authorityController.deleteAuthority);
