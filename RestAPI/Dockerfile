@@ -3,23 +3,23 @@ FROM node:latest
 ENV NODE_ENV=production \
     GROUP_ID=1001 \
     USER_ID=1001 \
-    GROUP=flask \
-    USER=flask
+    GROUP=app \
+    USER=app
 
-WORKDIR /flask
+WORKDIR /app
 
-COPY app/package.json /flask
+COPY app/package.json /app
 RUN npm install
 
 RUN apt update -y && apt upgrade npm -y
 
-COPY app /flask
+COPY app /app
 
 RUN groupadd -r -g ${GROUP_ID} ${GROUP} && \
     useradd -rm -s /bin/bash -g ${GROUP} -u ${USER_ID} ${USER} && \
-    chown -R ${GROUP}:${USER} /flask
+    chown -R ${GROUP}:${USER} /app
 
-USER flask
+USER app
 
 EXPOSE 3000
 

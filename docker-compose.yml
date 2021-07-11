@@ -1,8 +1,8 @@
 version: "3.9"
 services:
     biu:
-        image: biu_flask:latest
-        container_name: flask
+        image: biu_app:latest
+        container_name: app
         restart: always
         environment:
             MONGO_USERNAME: $MONGO_ROOT_USER
